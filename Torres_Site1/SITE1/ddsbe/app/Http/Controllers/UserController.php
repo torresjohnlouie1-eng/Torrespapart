@@ -18,14 +18,10 @@ class UserController extends Controller
         $this->request = $request;
     }
 
-    //Old code
-    /*public function getUsers()
-    {
-        $users = User::all();
-        return response()->json($users,200);
-    }*/
-    
-    //Get all users
+    /**
+     * GET ALL USERS
+     * URL: GET http://localhost:8000/users
+     */
     public function index()
     {
         $users = User::all();
@@ -33,7 +29,8 @@ class UserController extends Controller
     }
 
     /**
-     * Create a new user
+     * CREATE NEW USER (This will trigger the "Required" errors)
+     * URL: POST http://localhost:8000/users
      */
     public function add(Request $request)
     {
@@ -43,6 +40,7 @@ class UserController extends Controller
             'gender'   => 'required|in:Male,Female',
         ];
 
+        // If any of these are missing in Postman, it shows the error list you wanted
         $this->validate($request, $rules);
         
         $user = User::create($request->all());
@@ -51,17 +49,18 @@ class UserController extends Controller
     }
 
     /**
-     * Obtain and show one user
+     * SHOW ONE USER
+     * URL: GET http://localhost:8000/users/{id}
      */
-public function show($id)
-{
-    // If ID is not found, the Handler we just setup will 
-    // catch the error and return your custom JSON automatically.
-    $user = User::findOrFail($id); 
-    return $this->successResponse($user);
-}
+    public function show($id)
+    {
+        $user = User::findOrFail($id); 
+        return $this->successResponse($user);
+    }
+
     /**
-     * Update an existing user
+     * UPDATE EXISTING USER
+     * URL: PUT/PATCH http://localhost:8000/users/{id}
      */
     public function update(Request $request, $id)
     {
@@ -74,8 +73,11 @@ public function show($id)
         $this->validate($request, $rules);
 
         $user = User::findOrFail($id);
+        
+        // Fill the model with the new data
         $user->fill($request->all());
 
+        // Check if anything actually changed
         if ($user->isClean()) {
             return $this->errorResponse(
                 'At least one value must change', 
@@ -88,7 +90,8 @@ public function show($id)
     }
 
     /**
-     * Remove an existing user
+     * DELETE A USER
+     * URL: DELETE http://localhost:8000/users/{id}
      */
     public function delete($id)
     {
